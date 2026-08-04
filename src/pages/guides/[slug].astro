@@ -1,0 +1,76 @@
+---
+import Base from '@/layouts/Base.astro';
+import { GUIDES } from '@/data/kenya';
+import { renderMarkdown } from '@/lib/markdown';
+
+export function getStaticPaths() {
+  return GUIDES.map((guide) => ({
+    params: { slug: guide.slug },
+    props: { guide },
+  }));
+}
+
+const { guide } = Astro.props;
+const related = GUIDES.filter((g) => g.slug !== guide.slug && g.category === guide.category).slice(0, 3);
+---
+
+<Base
+  title={`${guide.title} | JengaCalc`}
+  description={guide.description}
+  ogType="article"
+>
+  <article>
+    <section slot="head">
+      <script type="application/ld+json" set:html={JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Article",
+        headline: guide.title,
+        description: guide.description,
+        datePublished: guide.publishDate,
+        author: { "@type": "Organization", name: "JengaCalc" },
+        publisher: { "@type": "Organization", name: "JengaCalc" },
+        keywords: guide.keywords.join(', '),
+      })} />
+    </section>
+    <section class="border-b border-ink-200 bg-ink-900 py-16 text-ink-50 md:py-20">
+      <div class="container-prose">
+        <div class="flex items-center gap-3">
+          <span class="rounded-full bg-clay-600 px-3 py-1 text-xs font-medium text-ink-50">{guide.category}</span>
+          <span class="text-sm text-ink-400">{guide.readTime}</span>
+        </div>
+        <h1 class="mt-5 font-display text-display-md font-semibold leading-tight text-ink-50 text-balance">
+          {guide.title}
+        </h1>
+        <p class="mt-4 text-lg leading-relaxed text-ink-300 text-pretty">{guide.description}</p>
+        <p class="mt-4 text-sm text-ink-500">Published {new Date(guide.publishDate).toLocaleDateString('en-KE', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+      </div>
+    </section>
+
+    <section class="container-prose py-12 md:py-16">
+      <div class="prose-kenya" set:html={renderMarkdown(guide.content)}>
+      </div>
+
+      <div class="mt-12 rounded-md border border-clay-200 bg-clay-50 p-6">
+        <h3 class="font-display text-lg font-medium text-ink-900">Get a tailored estimate for your build</h3>
+        <p class="mt-2 text-sm text-ink-600">
+          Use our calculator to get a cost range for your specific county, house type, and finish level.
+        </p>
+        <a href="/calculator" class="btn-primary mt-4">Calculate My Build Cost</a>
+      </div>
+
+      {related.length > 0 && (
+        <div class="mt-16 border-t border-ink-200 pt-12">
+          <h2 class="font-display text-2xl font-medium text-ink-900">Related guides</h2>
+          <div class="mt-6 grid gap-6 sm:grid-cols-3">
+            {related.map((g) => (
+              <a href={`/guides/${g.slug}`} class="card group p-5 transition-all hover:shadow-md">
+                <span class="text-xs text-ink-400">{g.category} &middot; {g.readTime}</span>
+                <h3 class="mt-2 font-display text-base font-medium text-ink-900 group-hover:text-clay-700">{g.title}</h3>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+    </section>
+  </article>
+</Base>
