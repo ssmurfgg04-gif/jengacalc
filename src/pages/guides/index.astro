@@ -1,5 +1,6 @@
 ---
 import Base from '@/layouts/Base.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
 import { GUIDES } from '@/data/kenya';
 
 const categories = ['All', ...new Set(GUIDES.map((g) => g.category))];
@@ -9,8 +10,26 @@ const categories = ['All', ...new Set(GUIDES.map((g) => g.category))];
   title="Build Guides — Kenya Construction Advice | JengaCalc"
   description="In-depth guides on building costs, materials, design choices, and construction process in Kenya. Written for Kenyan builders, by people who know the market."
 >
+  <section slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      name: 'JengaCalc Build Guides',
+      itemListElement: GUIDES.map((guide, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: guide.title,
+        url: `${Astro.site}guides/${guide.slug}`,
+      })),
+    })} />
+  </section>
+
   <section class="border-b border-ink-200 bg-ink-900 py-16 text-ink-50 md:py-20">
     <div class="container-wide max-w-3xl">
+      <Breadcrumbs onDark items={[
+        { label: 'Home', href: '/' },
+        { label: 'Guides' },
+      ]} />
       <p class="eyebrow text-clay-300">Guides</p>
       <h1 class="mt-3 font-display text-display-lg font-semibold leading-tight text-ink-50 text-balance">
         Build guides for Kenyan builders

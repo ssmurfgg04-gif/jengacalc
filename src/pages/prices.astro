@@ -1,5 +1,6 @@
 ---
 import Base from '@/layouts/Base.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
 import PriceTracker from '@/components/PriceTracker.tsx';
 ---
 
@@ -9,6 +10,10 @@ import PriceTracker from '@/components/PriceTracker.tsx';
 >
   <section class="border-b border-ink-200 bg-ink-900 py-16 text-ink-50 md:py-20">
     <div class="container-wide max-w-3xl">
+      <Breadcrumbs onDark items={[
+        { label: 'Home', href: '/' },
+        { label: 'Material Prices' },
+      ]} />
       <p class="eyebrow text-clay-300">Material Prices</p>
       <h1 class="mt-3 font-display text-display-lg font-semibold leading-tight text-ink-50 text-balance">
         Construction material prices in Kenya

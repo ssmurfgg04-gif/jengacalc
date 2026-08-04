@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { MATERIAL_PRICES, type MaterialPrice } from '@/data/kenya';
-import { fetchMaterialPrices, submitPrice, type DbMaterialPrice } from '@/lib/db';
+import { submitPrice } from '@/lib/clientStore';
 
 const CATEGORIES = ['All', 'Cement', 'Steel', 'Roofing', 'Walling', 'Aggregates', 'Timber', 'Paint', 'Finishes', 'Electrical', 'Plumbing', 'Doors & Windows'];
 
@@ -12,36 +12,17 @@ function formatDate(iso: string): string {
 export default function PriceTracker() {
   const [category, setCategory] = useState('All');
   const [search, setSearch] = useState('');
-  const [dbPrices, setDbPrices] = useState<DbMaterialPrice[]>([]);
   const [loading, setLoading] = useState(true);
   const [showSubmitForm, setShowSubmitForm] = useState(false);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const prices = await fetchMaterialPrices();
-        if (prices.length > 0) setDbPrices(prices);
-      } catch {
-        // fall through to static data
-      }
-      setLoading(false);
-    })();
+    // Prices come from the curated static dataset (refreshed monthly).
+    // Short delay so the skeleton state feels intentional rather than flashy.
+    const t = setTimeout(() => setLoading(false), 250);
+    return () => clearTimeout(t);
   }, []);
 
-  const prices: MaterialPrice[] = useMemo(() => {
-    if (dbPrices.length > 0) {
-      return dbPrices.map((d) => ({
-        materialName: d.material_name,
-        category: d.category,
-        unit: d.unit,
-        priceKes: Number(d.price_kes),
-        county: d.county,
-        source: d.source,
-        lastUpdated: d.last_updated,
-      }));
-    }
-    return MATERIAL_PRICES;
-  }, [dbPrices]);
+  const prices: MaterialPrice[] = useMemo(() => MATERIAL_PRICES, []);
 
   const filtered = useMemo(() => {
     return prices.filter((p) => {
@@ -162,7 +143,7 @@ function SubmitPriceForm({ onClose }: { onClose: () => void }) {
     setError('');
 
     try {
-      await submitPrice({
+      const ok = await submitPrice({
         materialName,
         county,
         town: town || undefined,
@@ -170,6 +151,7 @@ function SubmitPriceForm({ onClose }: { onClose: () => void }) {
         unit,
         submitterName: submitterName || undefined,
       });
+      if (!ok) throw new Error('submit failed');
       setSubmitted(true);
     } catch {
       setError('Something went wrong. Please try again.');

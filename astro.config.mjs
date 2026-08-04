@@ -1,6 +1,7 @@
 import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
 import tailwind from '@astrojs/tailwind';
+import netlify from '@astrojs/netlify';
 import { fileURLToPath, URL } from 'node:url';
 
 export default defineConfig({
@@ -10,7 +11,8 @@ export default defineConfig({
     react(),
     tailwind({ applyBaseStyles: false }),
   ],
-  output: 'static',
+  adapter: netlify(),
+  output: 'hybrid',
   build: {
     format: 'directory',
   },

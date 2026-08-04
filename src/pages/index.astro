@@ -11,6 +11,19 @@ const popularMaterials = MATERIAL_PRICES.filter((m) =>
 ---
 
 <Base>
+  <section slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: [
+        { '@type': 'Question', name: 'How much does it cost to build a house per square metre in Kenya in 2026?', acceptedAnswer: { '@type': 'Answer', text: 'Roughly KES 35,000–45,000/m² for basic finishes, 50,000–65,000/m² for mid-range, and 70,000–95,000/m² for high-end, before land. Central Nairobi runs 25–30% above the national average.' } },
+        { '@type': 'Question', name: 'Is black cotton soil a problem for building in Kenya?', acceptedAnswer: { '@type': 'Answer', text: 'Yes, in areas like Kitengela, Syokimau, Athi River, Kamulu, and parts of Kajiado, Kiambu, Machakos, and the Rift Valley. A soil test and a raft foundation, soil replacement, or piles are essential and can add 30–50% to foundation cost.' } },
+        { '@type': 'Question', name: 'How do I avoid being scammed when building remotely from abroad?', acceptedAnswer: { '@type': 'Answer', text: 'Never pay more than 10% mobilisation upfront, pay in stages with a 10% retention per stage, hold a final 10% until the defects period ends, appoint someone on the ground to inspect weekly, and get a written contract.' } },
+        { '@type': 'Question', name: 'Why do material prices vary so much between counties?', acceptedAnswer: { '@type': 'Answer', text: 'Transport and supply chains. Nairobi has the cheapest delivered materials; rural and coastal counties pay a delivery premium. We adjust every material and labor rate by county rather than giving one national figure.' } },
+      ],
+    })} />
+  </section>
+
   {/* Hero */}
   <section class="relative overflow-hidden border-b border-ink-200 bg-ink-900 text-ink-50">
     <div class="absolute inset-0 opacity-[0.04]" style="background-image: url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23F5E8D8%22%20fill-opacity%3D%220.4%22%3E%3Cpath%20d%3D%22M36%2034v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6%2034v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6%204V0H4v4H0v2h4v4h2V6h4V4H6z%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E');"></div>
@@ -180,6 +193,58 @@ const popularMaterials = MATERIAL_PRICES.filter((m) =>
             Labor and transport costs vary by county. Nairobi is not Nakuru is not Mombasa. Our calculator adjusts for where you build.
           </p>
         </div>
+      </div>
+    </div>
+  </section>
+
+  {/* FAQ */}
+  <section class="border-t border-ink-200 bg-ink-50 py-16 md:py-20">
+    <div class="container-wide">
+      <div class="mb-10 max-w-2xl">
+        <p class="eyebrow">Real Answers</p>
+        <h2 class="mt-3 font-display text-display-md font-semibold text-ink-900">
+          What Kenyan Builders Actually Ask
+        </h2>
+        <p class="mt-3 text-lg text-ink-600">
+          Field-level questions from construction forums and real projects �?" answered straight.
+        </p>
+      </div>
+
+      <div class="grid gap-4 md:grid-cols-2">
+        {[
+          {
+            q: 'How much does it cost to build a house per square metre in Kenya in 2026?',
+            a: 'Roughly KES 35,000�?"45,000/m² for basic finishes, 50,000�?"65,000/m² for mid-range, and 70,000�?"95,000/m² for high-end, before land. Central Nairobi runs 25�?"30% above the national average. Use the calculator for a county-adjusted figure.',
+          },
+          {
+            q: 'Why is my quoted cost so much higher than I budgeted?',
+            a: 'Usually because of hidden items: material transport to site, county approvals, professional fees, black cotton soil foundation work, and a missing contingency. Budget 10�?"15% extra as contingency and itemise the BOQ to see the difference.',
+          },
+          {
+            q: 'Is black cotton soil a problem for building in Kenya?',
+            a: 'Yes, in areas like Kitengela, Syokimau, Athi River, Kamulu, and parts of Kajiado, Kiambu, Machakos, and the Rift Valley. It swells and shrinks with moisture, so a soil test and a raft foundation, soil replacement, or piles are essential. These can add 30�?"50% to foundation cost but prevent cracks later.',
+          },
+          {
+            q: 'How long does it take to build a bungalow in Kenya?',
+            a: 'Expect 6�?"12 months for a bungalow and longer for a maisonette, including the two rainy seasons (roughly March�?"May and October�?"December) which can pause concrete and foundation work.',
+          },
+          {
+            q: 'How do I avoid being scammed when building remotely from abroad?',
+            a: 'Never pay more than 10% mobilisation upfront, pay in stages with a 10% retention per stage, hold a final 10% until the 3�?"6 month defects period ends, appoint someone on the ground to inspect weekly, and get a written contract with a payment schedule and defects clause.',
+          },
+          {
+            q: 'Why do material prices vary so much between counties?',
+            a: 'Transport and supply chains. Nairobi has the cheapest delivered materials; rural and coastal counties pay a delivery premium. That is why we adjust every material and labor rate by county rather than giving one national figure.',
+          },
+        ].map((item) => (
+          <details class="card p-5 group open:shadow-md">
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-base font-medium text-ink-900">
+              {item.q}
+              <span class="text-clay-600 transition-transform group-open:rotate-45 text-xl leading-none">+</span>
+            </summary>
+            <p class="mt-3 text-sm leading-relaxed text-ink-600">{item.a}</p>
+          </details>
+        ))}
       </div>
     </div>
   </section>

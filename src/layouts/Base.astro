@@ -35,6 +35,28 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
 
+    <script type="application/ld+json" set:html={JSON.stringify({
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'Organization',
+          '@id': `${canonicalURL.split('/').slice(0, 3).join('/')}/#organization`,
+          name: 'JengaCalc',
+          url: new URL('/', Astro.site).toString(),
+          description: 'Kenya build-cost calculator and construction price tracker.',
+          areaServed: 'Kenya',
+          knowsAbout: ['Construction cost estimation', 'Building materials prices in Kenya', 'Bill of Quantities'],
+        },
+        {
+          '@type': 'WebSite',
+          '@id': `${canonicalURL.split('/').slice(0, 3).join('/')}/#website`,
+          url: new URL('/', Astro.site).toString(),
+          name: 'JengaCalc',
+          publisher: { '@id': `${canonicalURL.split('/').slice(0, 3).join('/')}/#organization` },
+        },
+      ],
+    })} />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

@@ -1,5 +1,6 @@
 ---
 import Base from '@/layouts/Base.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
 import CostCalculator from '@/components/CostCalculator.tsx';
 import { COUNTIES, HOUSE_TYPES, FINISH_TIERS } from '@/data/kenya';
 import { calculateEstimate, formatKes } from '@/lib/costEngine';
@@ -52,6 +53,11 @@ const transportText = county.transportMultiplier > 1
 >
   <section class="border-b border-ink-200 bg-ink-900 py-16 text-ink-50 md:py-20">
     <div class="container-wide max-w-3xl">
+      <Breadcrumbs onDark items={[
+        { label: 'Home', href: '/' },
+        { label: 'Counties', href: '/counties' },
+        { label: county.name },
+      ]} />
       <p class="eyebrow text-clay-300">{county.region} Region</p>
       <h1 class="mt-3 font-display text-display-lg font-semibold leading-tight text-ink-50 text-balance">
         Cost to build in {county.name}

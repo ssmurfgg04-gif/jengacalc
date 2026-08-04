@@ -139,3 +139,41 @@
   from { transform: scaleX(0); }
   to { transform: scaleX(1); }
 }
+
+
+@layer components {
+  .breadcrumbs {
+    @apply flex items-center gap-2 py-3 text-sm;
+  }
+  .breadcrumbs ol {
+    @apply flex flex-wrap items-center gap-2;
+  }
+  .breadcrumbs li {
+    @apply flex items-center gap-2 text-ink-500;
+  }
+  .breadcrumbs li:not(:last-child)::after {
+    content: "/";
+    @apply text-ink-300;
+  }
+  .breadcrumbs a {
+    @apply text-clay-600 transition-colors hover:text-clay-700;
+  }
+  .breadcrumbs [aria-current="page"] {
+    @apply font-medium text-ink-800;
+  }
+  .breadcrumbs-on-dark {
+    @apply text-ink-300;
+  }
+  .breadcrumbs-on-dark li {
+    @apply text-ink-400;
+  }
+  .breadcrumbs-on-dark a {
+    @apply text-clay-300 hover:text-clay-200;
+  }
+  .breadcrumbs-on-dark li:not(:last-child)::after {
+    @apply text-ink-500;
+  }
+  .breadcrumbs-on-dark [aria-current="page"] {
+    @apply text-ink-50;
+  }
+}
