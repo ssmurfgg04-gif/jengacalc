@@ -27,7 +27,7 @@ export const POST: APIRoute = async ({ request }) => {
   if (!Number.isFinite(priceKes) || priceKes <= 0 || priceKes > 100_000_000)
     return bad('Price must be a valid positive number.');
 
-  const record = addPrice({
+  const record = await addPrice({
     materialName: materialName.slice(0, 120),
     county: county.slice(0, 80),
     town: body.town ? String(body.town).slice(0, 80) : undefined,
@@ -43,7 +43,7 @@ export const POST: APIRoute = async ({ request }) => {
 };
 
 export const GET: APIRoute = async () => {
-  return new Response(JSON.stringify({ submissions: listPrices(50) }), {
+  return new Response(JSON.stringify({ submissions: await listPrices(50) }), {
     headers: { 'Content-Type': 'application/json' },
   });
 };

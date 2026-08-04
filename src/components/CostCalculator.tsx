@@ -51,6 +51,17 @@ function prefilled<T>(key: string, list: readonly { value: T }[], fallback: T): 
   return v !== null && list.some((item) => String(item.value) === v) ? (v as unknown as T) : fallback;
 }
 
+// Fire a GA4 event (via gtag or dataLayer) when present. No-op otherwise.
+function trackEvent(name: string, params?: Record<string, unknown>) {
+  try {
+    const w = window as unknown as { gtag?: (...a: unknown[]) => void; dataLayer?: Record<string, unknown>[] };
+    if (typeof w.gtag === 'function') w.gtag('event', name, params ?? {});
+    else if (Array.isArray(w.dataLayer)) w.dataLayer.push({ event: name, ...(params ?? {}) });
+  } catch {
+    // ignore tracking errors
+  }
+}
+
 interface Props {
   defaultCounty?: string;
   defaultHouseType?: HouseType;
@@ -149,10 +160,43 @@ export default function CostCalculator({
   const handleCheckoutSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!/^07\d{8}$/.test(phone.replace(/\s/g, '')) || !email.includes('@')) return;
+    trackEvent('jenga_pay_clicked', {
+      county: result.county.name,
+      houseType: result.houseTypeLabel,
+      sizeSqm,
+      finish: result.finishTierLabel,
+      price: 200,
+    });
     setCheckoutStage('paybill');
   };
 
   const finishOrder = () => {
+    // Record purchase intent durably (best-effort, non-blocking).
+    trackEvent('jenga_payment_confirmed', {
+      county: result.county.name,
+      houseType: result.houseTypeLabel,
+      sizeSqm,
+      finish: result.finishTierLabel,
+      price: 200,
+    });
+    try {
+      fetch('/api/order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          phone,
+          county: result.county.slug,
+          houseType,
+          bedrooms,
+          sizeSqm,
+          finishTier,
+          priceKes: 200,
+        }),
+      }).catch(() => {});
+    } catch {
+      // ignore network errors
+    }
     setOrderNote(`Order confirmed for ${email}. Estimate delivered below — use Print / Save as PDF to keep your copy.`);
     setCheckoutStage('done');
   };

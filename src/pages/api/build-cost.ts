@@ -31,7 +31,7 @@ export const POST: APIRoute = async ({ request }) => {
   if (!Number.isFinite(totalCostKes) || totalCostKes < 10000 || totalCostKes > 2000000000)
     return bad('Total cost must be a valid positive number.');
 
-  const record = addBuildCost({
+  const record = await addBuildCost({
     county,
     houseType,
     bedrooms,
@@ -42,7 +42,7 @@ export const POST: APIRoute = async ({ request }) => {
     submitterName: body.submitterName ? String(body.submitterName).slice(0, 80) : undefined,
   });
 
-  return new Response(JSON.stringify({ ok: true, id: record.id, total: countBuildCosts() }), {
+  return new Response(JSON.stringify({ ok: true, id: record.id, total: await countBuildCosts() }), {
     status: 201,
     headers: { 'Content-Type': 'application/json' },
   });
@@ -51,12 +51,12 @@ export const POST: APIRoute = async ({ request }) => {
 export const GET: APIRoute = async ({ request }) => {
   const url = new URL(request.url);
   if (url.searchParams.get('format') === 'csv') {
-    return new Response(buildCostsCsv(), {
+    return new Response(await buildCostsCsv(), {
       headers: { 'Content-Type': 'text/csv; charset=utf-8', 'Content-Disposition': 'attachment; filename="jengacalc-build-costs.csv"' },
     });
   }
   return new Response(
-    JSON.stringify({ total: countBuildCosts(), submissions: listBuildCosts(100) }),
+    JSON.stringify({ total: await countBuildCosts(), submissions: await listBuildCosts(100) }),
     { headers: { 'Content-Type': 'application/json' } },
   );
 };
