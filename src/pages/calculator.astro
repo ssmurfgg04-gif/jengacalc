@@ -11,6 +11,22 @@ import CostCalculator from '@/components/CostCalculator.tsx';
   <section slot="head">
     <script type="application/ld+json" set:html={JSON.stringify({
       "@context": "https://schema.org",
+      "@type": "Product",
+      name: "JengaCalc Personalized Build Cost PDF",
+      description: "A personalized, itemised build cost breakdown for your specific county, house type, size, and finish level in Kenya.",
+      offers: {
+        "@type": "Offer",
+        price: "200",
+        priceCurrency: "KES",
+        availability: "https://schema.org/InStock",
+        priceValidUntil: "2026-12-31",
+        acceptedPaymentMethod: ["https://schema.org/CashOnDelivery", "MPESA"],
+        url: "https://jengacalc.co.ke/calculator",
+      },
+      areaServed: "Kenya",
+    })} />
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
       "@type": "FAQPage",
       mainEntity: [
         {
@@ -48,14 +64,14 @@ import CostCalculator from '@/components/CostCalculator.tsx';
   </section>
 
   <section class="container-wide py-12 md:py-16">
-    <CostCalculator client:load />
+    <CostCalculator client:idle />
   </section>
 
   <section class="container-prose py-12">
     <h2 class="font-display text-2xl font-medium text-ink-900">How this calculator works</h2>
     <div class="prose-kenya mt-4">
       <p>
-        Our calculator uses a <strong>cost-per-square-metre</strong> model calibrated to Kenyan construction rates as of August 2026. The base rates are:
+        Our calculator uses a <strong>cost-per-square-metre</strong> model calibrated to Kenyan construction rates as of August 2026, cross-checked against quantity-surveyor market surveys (IQSK Handbook methodology) and county-level labor/transport data. The base rates are:
       </p>
       <ul>
         <li><strong>Basic (rental standard):</strong> KES 32,000/sqm — cement floors, basic fittings, standard mabati roof</li>

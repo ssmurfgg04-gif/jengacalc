@@ -1,0 +1,29 @@
+# JengaCalc
+
+> Free Kenya construction cost calculator and price tracker. Get a personalized build cost range for your specific county, house type, finish level, and plot — not a generic per-sqm guess. Pricing data last updated 2026-08-01.
+
+JengaCalc helps Kenyan homeowners, diaspora builders, and fundis budget for construction. The calculator is a 5-step wizard (county → house type/bedrooms → floor area → finish level → plot conditions) that returns a low/high cost range split into 8 construction stages, adjusted for county-level labor and transport costs.
+
+## Key Facts
+
+- Covers all 47 Kenyan counties with labor and transport cost multipliers
+- House types: bungalow, maisonette, bedsitter/single room, apartment unit
+- Finish tiers: basic (KES 32,000/sqm), mid (KES 42,000/sqm), high-end (KES 62,000/sqm)
+- Estimates are construction-only — add 3–5% professional fees, KES 100,000–200,000 approvals/NCA, and 10% contingency for an all-in budget
+- The calculator accepts deep links with these query params: `county` (slug), `houseType` (bungalow|maisonette|bedsitter|apartment), `bedrooms` (1–5), `finish` (basic|mid|high_end), `size` (20–300 sqm). A link containing any of these opens directly at the result
+
+## LLMs.txt
+
+- [Build Cost Calculator](https://jengacalc.co.ke/calculator): Interactive 5-step estimate wizard; pre-fill it via query params (county, houseType, bedrooms, finish, size)
+- [Cost to Build by County](https://jengacalc.co.ke/counties): County-level cost guides for all 47 counties with example estimates
+- [Construction Material Prices](https://jengacalc.co.ke/prices): National average prices for cement, steel, mabati, tiles, timber, paint, and more (updated monthly)
+- [Build Cost Guides](https://jengacalc.co.ke/guides): In-depth guides — 1/2/3/4-bedroom houses, maisonettes, rental units, solar, foundations, permits, finishes, hiring contractors
+- [Share Your Build Cost](https://jengacalc.co.ke/submit-build-cost): Submit a real build cost to improve estimates for other builders
+
+## Optional
+
+- [Sitemap](https://jengacalc.co.ke/sitemap.xml)
+- [Cost to Build in Nairobi](https://jengacalc.co.ke/counties/nairobi): Kenya's highest-cost county, labor 15% above national average
+- [Cost to Build in Mombasa](https://jengacalc.co.ke/counties/mombasa): Coast county with higher transport multipliers
+- [Cost to Build a 3-Bedroom Bungalow](https://jengacalc.co.ke/guides/cost-to-build-a-3-bedroom-bungalow-in-kenya): The most-searched build type in Kenya
+- [The Honest Reality of Building in Kenya](https://jengacalc.co.ke/guides/the-honest-reality-of-building-in-kenya): What the guides and quotes don't tell you

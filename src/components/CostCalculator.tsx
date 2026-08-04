@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   COUNTIES,
   HOUSE_TYPES,
@@ -79,23 +79,28 @@ export default function CostCalculator({
 }: Props) {
   const [step, setStep] = useState(() => {
     if (typeof window === 'undefined') return 1;
-    return new URLSearchParams(window.location.search).size > 0 ? 6 : 1;
+    const qs = new URLSearchParams(window.location.search);
+    // Only deep-link straight to results when a known pre-fill key is present
+    // (utm_* or other tracking params should not skip the steps).
+    return ['county', 'houseType', 'bedrooms', 'finish', 'size'].some((k) => qs.has(k)) ? 6 : 1;
   });
   const [countySlug, setCountySlug] = useState(() => getParam('county') ?? defaultCounty);
-  const [houseType, setHouseType] = useState<HouseType>(() =>
-    prefilled('houseType', HOUSE_TYPES, defaultHouseType)
-  );
-  const [bedrooms, setBedrooms] = useState(() => {
+  const initialHouseType = prefilled('houseType', HOUSE_TYPES, defaultHouseType);
+  const initialBedrooms = (() => {
     const v = Number(getParam('bedrooms'));
     return Number.isFinite(v) && v >= 1 && v <= 5 ? v : defaultBedrooms;
-  });
+  })();
+  const [houseType, setHouseType] = useState<HouseType>(initialHouseType);
+  const [bedrooms, setBedrooms] = useState(initialBedrooms);
   const [finishTier, setFinishTier] = useState<FinishTier>(() =>
     prefilled('finish', FINISH_TIERS, defaultFinishTier)
   );
   const [sizeSqm, setSizeSqm] = useState(() => {
     const v = Number(getParam('size'));
     if (Number.isFinite(v) && v >= 20 && v <= 300) return v;
-    return defaultSizeSqm ?? getDefaultSize(defaultHouseType, defaultBedrooms);
+    // Base the auto-estimated size on the *pre-filled* type/bedrooms, not the
+    // component defaults, so deep links stay internally consistent.
+    return defaultSizeSqm ?? getDefaultSize(initialHouseType, initialBedrooms);
   });
   const [sizeManual, setSizeManual] = useState(() => {
     const v = Number(getParam('size'));
@@ -152,9 +157,15 @@ export default function CostCalculator({
 
   const handleCopy = useCallback(() => {
     const text = `Build Cost Estimate\n${result.houseTypeLabel} in ${result.county.name}\n${result.finishTierLabel}\nSize: ${sizeSqm} sqm\n\nTotal: ${formatKesFull(result.totalLow)} – ${formatKesFull(result.totalHigh)}\nPer sqm: ${formatKesFull(result.perSqmLow)} – ${formatKesFull(result.perSqmHigh)}\n\n${result.breakdown.map((b) => `${b.category}: ${formatKesFull(b.lowKes)} – ${formatKesFull(b.highKes)}`).join('\n')}\n\nEstimate from JengaCalc.co.ke`;
-    navigator.clipboard?.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      try {
+        navigator.clipboard.writeText(text);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch {
+        // clipboard unavailable — ignore
+      }
+    }
   }, [result, sizeSqm]);
 
   const handleCheckoutSubmit = (e: React.FormEvent) => {
@@ -203,6 +214,16 @@ export default function CostCalculator({
 
   const countyName = result.county.name;
   const orderRef = `JENGA-${email.split('@')[0].slice(0, 6).toUpperCase() || 'YOU'}`;
+
+  // Close the checkout modal with Escape, and lock background scroll while open.
+  useEffect(() => {
+    if (!showCheckout) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShowCheckout(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [showCheckout]);
 
   return (
     <div className="grid gap-8 lg:grid-cols-5">
@@ -589,6 +610,9 @@ export default function CostCalculator({
               >
                 Get my PDF — KES 200
               </button>
+              <p className="mt-2 text-xs text-ink-400">
+                Your full breakdown is already visible on this page — the PDF is the same numbers, formatted for printing. Indicative budget estimate only, not a certified Bill of Quantities.
+              </p>
             </div>
 
             {/* Submit your build cost */}
@@ -608,10 +632,13 @@ export default function CostCalculator({
       {/* Checkout fake-door modal */}
       {showCheckout && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/60 p-4" onClick={() => setShowCheckout(false)}>
-          <div
-            className="w-full max-w-md animate-fade-in rounded-xl bg-white p-6 shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
+        <div
+          className="w-full max-w-md animate-fade-in rounded-xl bg-white p-6 shadow-2xl"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Get your PDF estimate — KES 200"
+          onClick={(e) => e.stopPropagation()}
+        >
             {checkoutStage === 'form' && (
               <>
                 <h4 className="font-display text-lg font-semibold text-ink-900">Your personalized PDF</h4>
@@ -625,6 +652,7 @@ export default function CostCalculator({
                     <input
                       type="email"
                       required
+                      autoFocus
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="input-field w-full"
@@ -670,6 +698,9 @@ export default function CostCalculator({
                 <button onClick={finishOrder} className="btn-primary mt-4 w-full">
                   I've sent KES 200 — show my PDF
                 </button>
+                <p className="mt-2 text-xs text-ink-400">
+                  Not happy with the PDF? Reply to the confirmation email we send to {email || 'your inbox'} within 24 hours for a full refund.
+                </p>
               </>
             )}
 
