@@ -45,6 +45,17 @@ const laborText = county.laborMultiplier > 1
 const transportText = county.transportMultiplier > 1
   ? `${Math.round((county.transportMultiplier - 1) * 100)}% above baseline`
   : 'at baseline';
+
+function prefillHref(h: { type: string; bedrooms: number; tier: string; sizeSqm: number }): string {
+  const p = new URLSearchParams({
+    county: county.slug,
+    houseType: h.type,
+    bedrooms: String(h.bedrooms),
+    finish: h.tier,
+    size: String(h.sizeSqm),
+  });
+  return `/calculator?${p.toString()}`;
+}
 ---
 
 <Base
@@ -82,6 +93,7 @@ const transportText = county.transportMultiplier > 1
             <th class="px-3 py-3 font-medium text-ink-500">Finish Level</th>
             <th class="px-3 py-3 text-right font-medium text-ink-500">Low</th>
             <th class="px-3 py-3 text-right font-medium text-ink-500">High</th>
+            <th class="px-3 py-3 font-medium text-ink-500"></th>
           </tr>
         </thead>
         <tbody>
@@ -92,6 +104,9 @@ const transportText = county.transportMultiplier > 1
               <td class="px-3 py-3 text-ink-500">{FINISH_TIERS.find((t) => t.value === e.tier)?.label}</td>
               <td class="px-3 py-3 text-right font-mono text-ink-700">{formatKes(e.result.totalLow)}</td>
               <td class="px-3 py-3 text-right font-mono font-semibold text-ink-900">{formatKes(e.result.totalHigh)}</td>
+              <td class="px-3 py-3 text-right">
+                <a href={prefillHref(e)} class="text-sm font-medium text-clay-600 hover:text-clay-700">Personalize &rarr;</a>
+              </td>
             </tr>
           ))}
         </tbody>

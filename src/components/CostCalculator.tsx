@@ -38,6 +38,19 @@ const STEPS = [
   { id: 5, label: 'Your plot' },
 ];
 
+// Read pre-fill values from the URL (?county=&houseType=&bedrooms=&finish=&size=)
+// so content pages can deep-link into a personalized estimate.
+function getParam(key: string): string | null {
+  if (typeof window === 'undefined') return null;
+  const v = new URLSearchParams(window.location.search).get(key);
+  return v ? v.toLowerCase() : null;
+}
+
+function prefilled<T>(key: string, list: readonly { value: T }[], fallback: T): T {
+  const v = getParam(key);
+  return v !== null && list.some((item) => String(item.value) === v) ? (v as unknown as T) : fallback;
+}
+
 interface Props {
   defaultCounty?: string;
   defaultHouseType?: HouseType;
@@ -53,15 +66,30 @@ export default function CostCalculator({
   defaultFinishTier = 'mid',
   defaultSizeSqm,
 }: Props) {
-  const [step, setStep] = useState(1);
-  const [countySlug, setCountySlug] = useState(defaultCounty);
-  const [houseType, setHouseType] = useState<HouseType>(defaultHouseType);
-  const [bedrooms, setBedrooms] = useState(defaultBedrooms);
-  const [finishTier, setFinishTier] = useState<FinishTier>(defaultFinishTier);
-  const [sizeSqm, setSizeSqm] = useState(
-    defaultSizeSqm ?? getDefaultSize(defaultHouseType, defaultBedrooms)
+  const [step, setStep] = useState(() => {
+    if (typeof window === 'undefined') return 1;
+    return new URLSearchParams(window.location.search).size > 0 ? 6 : 1;
+  });
+  const [countySlug, setCountySlug] = useState(() => getParam('county') ?? defaultCounty);
+  const [houseType, setHouseType] = useState<HouseType>(() =>
+    prefilled('houseType', HOUSE_TYPES, defaultHouseType)
   );
-  const [sizeManual, setSizeManual] = useState(Boolean(defaultSizeSqm));
+  const [bedrooms, setBedrooms] = useState(() => {
+    const v = Number(getParam('bedrooms'));
+    return Number.isFinite(v) && v >= 1 && v <= 5 ? v : defaultBedrooms;
+  });
+  const [finishTier, setFinishTier] = useState<FinishTier>(() =>
+    prefilled('finish', FINISH_TIERS, defaultFinishTier)
+  );
+  const [sizeSqm, setSizeSqm] = useState(() => {
+    const v = Number(getParam('size'));
+    if (Number.isFinite(v) && v >= 20 && v <= 300) return v;
+    return defaultSizeSqm ?? getDefaultSize(defaultHouseType, defaultBedrooms);
+  });
+  const [sizeManual, setSizeManual] = useState(() => {
+    const v = Number(getParam('size'));
+    return Boolean(defaultSizeSqm) || (Number.isFinite(v) && v >= 20 && v <= 300);
+  });
 
   const [soilType, setSoilType] = useState<SoilType>('not_sure');
   const [roadAccess, setRoadAccess] = useState<RoadAccess>('not_sure');

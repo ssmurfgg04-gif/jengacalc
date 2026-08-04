@@ -13,6 +13,20 @@ export function getStaticPaths() {
 
 const { guide } = Astro.props;
 const related = GUIDES.filter((g) => g.slug !== guide.slug && g.category === guide.category).slice(0, 3);
+
+// Derive pre-fill params from the guide slug so the CTA deep-links into a
+// personalized estimate rather than a blank calculator.
+function guidePrefill(slug: string): string {
+  const params = new URLSearchParams();
+  if (slug.includes('maisonette')) params.set('houseType', 'maisonette');
+  else if (slug.includes('bungalow')) params.set('houseType', 'bungalow');
+  else if (slug.includes('rental-unit') || slug.includes('bedsitter')) params.set('houseType', 'bedsitter');
+  const bedrooms = slug.match(/(\d)-bedroom/);
+  if (bedrooms) params.set('bedrooms', bedrooms[1]);
+  return params.toString();
+}
+const prefillQuery = guidePrefill(guide.slug);
+const ctaHref = `/calculator${prefillQuery ? `?${prefillQuery}` : ''}`;
 ---
 
 <Base
@@ -59,9 +73,9 @@ const related = GUIDES.filter((g) => g.slug !== guide.slug && g.category === gui
       <div class="mt-12 rounded-md border border-clay-200 bg-clay-50 p-6">
         <h3 class="font-display text-lg font-medium text-ink-900">Get a tailored estimate for your build</h3>
         <p class="mt-2 text-sm text-ink-600">
-          Use our calculator to get a cost range for your specific county, house type, and finish level.
+          Use our calculator to get a personalized cost range for your specific county, house type, and finish level.
         </p>
-        <a href="/calculator" class="btn-primary mt-4">Calculate My Build Cost</a>
+        <a href={ctaHref} class="btn-primary mt-4">Get Your Estimate</a>
       </div>
 
       {related.length > 0 && (
