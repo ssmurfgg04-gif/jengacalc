@@ -1,4 +1,6 @@
 ---
+import SiteSearch from '@/components/SiteSearch.tsx';
+
 const nav = [
   { href: '/calculator', label: 'Calculator' },
   { href: '/prices', label: 'Material Prices' },
@@ -39,6 +41,10 @@ const path = Astro.url.pathname;
       Estimate My Build
     </a>
 
+    <div class="hidden md:block">
+      <SiteSearch client:visible />
+    </div>
+
     <button
       id="mobile-menu-toggle"
       class="md:hidden"
@@ -66,6 +72,9 @@ const path = Astro.url.pathname;
         </a>
       ))}
       <a href="/calculator" class="btn-primary mt-2">Estimate My Build</a>
+      <div class="mt-2">
+        <SiteSearch client:visible />
+      </div>
     </nav>
   </div>
 </header>
